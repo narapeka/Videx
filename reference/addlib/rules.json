@@ -1,0 +1,12 @@
+{
+  "rules": [
+    {
+      "id": "example-movie-001",
+      "name": "Movies to Library",
+      "source": "/Users/I034206/SAPDevelop/Development/testsource",
+      "target": "/Users/I034206/SAPDevelop/Development/testtarget",
+      "type": "movie",
+      "organize_by_initial": true
+    }
+  ]
+}
