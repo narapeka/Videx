@@ -18,6 +18,8 @@ I want to build a tool which can help me to manager and organize my media files.
 - **Task scheduling**: APScheduler
 - **Containerization**: Docker
 - **Package management**: pip + requirements.txt
+- **CloudDrive2 client**: [clouddrive2-client](https://pypi.org/project/clouddrive2-client) — Python library for file operations using cd2 grpc, faster than operate the locally mounted filesystem
+- **Watchfiles**: https://pypi.org/project/watchfiles/ - clouddrive2-client or the underlying CloudDrive2 API does not support subscribing to file change events, so we use watchfiles to watch on the mounted point.
 
 # Use Case Example
 
@@ -62,8 +64,7 @@ The app should be able to correclty distinguish movie and tv shows, and then rel
         /REMUX Movies/
             /Test Movie2 (2022) {tmdb-234555}/
                 Test movie2.mkv
-                Test movie2.chs.srt
-                Test movie2.eng.srt
+                Test movie2.srt
         /ISO Movies/
             /Test movie3 (2025) {tmdb-777777}/
                 Test movie3.iso
@@ -74,7 +75,7 @@ The app should be able to correclty distinguish movie and tv shows, and then rel
             /Test tv show1 (2002) {tmdb-222222}/
                 /Season 1/
                     Test tv show1 - S01E01 - episode title.mkv
-                    Test tv show1 - S01E01 - episode title.chs.srt
+                    Test tv show1 - S01E01 - episode title.srt
                     Test tv show1 - S01E02 - episode title.mkv
         /Europe TV Shows/
             /Test tv show2 (2005) {tmdb-5555555}/
@@ -148,7 +149,7 @@ The manual pipeline is a separate, on-demand operation -- not tied to any config
 1. **Select source folder** -- browse CloudDrive2 folders and pick the folder to process.
 2. **Review and select items** -- the app lists detected items with auto-classified media types. The user selects which items to process and can override media type if needed.
 3. **Configure run** -- choose target organized folder. Optionally enable auto-transfer, strm generation, and Emby refresh. Naming, category, and transfer rules are global -- no rule selection needed.
-4. **Process** -- the pipeline runs on selected items. Recognition results appear inline; low-confidence items can be resolved on the spot. After organize, the user can review results before confirming transfer.
+4. **Process** -- the pipeline runs on selected items. Recognition results appear inline; low-confidence items can be resolved on the spot. After organize, the user can review results before confirming transfer. 
 
 This creates no persistent task. All file operations are still recorded in the database for audit.
 
@@ -231,7 +232,7 @@ And there will be a lot of edge cases like below:
 
 - **Bare numeric filenames** (`1.mp4`, `2.mp4`): episode number inferred from filename, season inferred from parent folder name (e.g. `S02/` -> Season 2).
 - **No season folder, no season in filename**: default to Season 1.
-- **Specials / SP / OVA / extras**: **[TODO]** Organize into a "Specials" or "Season 0" folder
+- **Specials / SP / OVA / extras**: Organize into a "Specials" or "Season 0" folder
 - **Multi-episode files** (`S01E01-E03`): keep as single file.
 
 As I said, most cases are already covered in the reference project aigua.tv. We should respect the implementation as much as possible from there, until you find a new edge case.
@@ -290,7 +291,7 @@ tv:
   国漫:
     genre_ids: '16'
     origin_country: 'CN,TW,HK'
-    library_path: '/mnt/nas2/drama/国漫'
+    library_path: '/mnt/115/library/国漫'
     organize_by_initial: false
 
   日番:
@@ -301,7 +302,7 @@ tv:
 
   华语剧:
     origin_country: 'CN,TW,HK'
-    library_path: '/mnt/nas2/drama/国产剧'
+    library_path: '/mnt/115/library/国产剧'
     organize_by_initial: true
 
   日韩剧:
@@ -427,22 +428,21 @@ emby:
 - If a task only transfers physical files without strm generation, the refresh targets the **physical library paths**.
 - This avoids unnecessary full-library scans and makes refresh fast and targeted.
 
-### Tasks
+## Tasks
 
 Tasks only define where to watch and when to act. Naming, category, and transfer rules are global -- no need to select them per task.
 
-```yaml
-tasks:
-  - name: "Watch My Received"
+
+Tasks are stored in db and may contains following attributes:
+    name: "Watch My Received"
     watch_folder: "/mnt/115/My recieved"
     organized_folder: "/mnt/115/organized"
     polling_interval: 300          # seconds
     auto_transfer: false           # if true, transfer immediately after organize
-    transfer_schedule: "0 2 * * *" # cron expression for scheduled transfer
+    transfer_schedule: "0 2 * * *" # an independent scheduled transfer that always runs regardless of auto_transfer
     overwrite: "replace_folder"    # replace_folder | append_episode
     strm_enabled: true             # generate strm files after transfer
-    emby_refresh: true             # notify Emby after strm generation
-```
+
 
 **Overwrite modes:**
 - `replace_folder` -- for movies, replaces the entire movie folder. For TV shows, replaces the entire season folder. This is the default, matching the addlib behavior.
@@ -600,7 +600,7 @@ Every user-triggerable action in the UI, organized by location:
 | Action | Description |
 |--------|------------|
 | Edit task settings | Modify source/target folders, schedule, strm/Emby toggles |
-| Delete task | Remove task and optionally clean up its organized files |
+| Delete task | Remove task |
 | Enable / Disable task | Keep task configuration but stop all automatic processing |
 | View task logs | Browse logs filtered to this task |
 | Clear task logs | Remove old log entries for this task |
@@ -679,7 +679,9 @@ The app uses SQLite to track processing state and history.
 
 - Primary target: Docker container with docker-compose.
 - Single docker-compose file.
-- Configuration mounted as a /Config/.
+- Configuration mounted as a /Config/, which includes
+   /logs/ for log files.
+   videx.db
 
 ## Logging
 
@@ -694,18 +696,13 @@ The app uses SQLite to track processing state and history.
 
 ## CloudDrive2 gRPC
 
-CloudDrive2 exposes a gRPC API for file operations, which is faster than operating on the locally mounted filesystem.
+Use the **[clouddrive2-client](https://pypi.org/project/clouddrive2-client)** Python package as the wrapper for CloudDrive2's gRPC API. It is faster than operating on the locally mounted filesystem.
 
-**Required operations:**
+**Operations required from the client (implemented by clouddrive2-client):**
 - List directory contents
 - Move / rename files and folders
 - Create directories
 - Check file existence and metadata (size, modification time)
-- Possibly: watch/subscribe to directory changes (if supported by the API)
-
-**[TODO]** Document the exact gRPC proto definition or API reference for CloudDrive2. Is it publicly documented?
-
-**[TODO]** Does the gRPC API support subscribing to file change events, or is polling the only option?
 
 ## TMDB API
 
@@ -732,6 +729,13 @@ A `.strm` file is a plain text file containing a single line: the path or URL to
 
 **Generation rules:**
 - One `.strm` file per video file. The `.strm` file is placed in the strm output directory, mirroring the library folder structure.
+
+For example: 
+Library path: /mnt/115/library/REMUX/Test Movie2 (2022) {tmdb-234555}/Test movie2.mkv
+strm output: /strm_library/
+The strm files should be mirrors from category root:
+/strm_library/REMUX/Test Movie2 (2022) {tmdb-234555}/Test movie2.strm
+
 - Subtitle files and other companion files are **copied** (not moved) into the strm output folder alongside the `.strm` file, keeping the same relative structure. This way Emby can find subtitles and metadata next to the `.strm` file.
 - Only video files generate `.strm` files. Subtitles and companion files are never converted to `.strm`.
 
@@ -760,7 +764,7 @@ The app is structured as a set of loosely coupled modules:
 | Module | Responsibility |
 |--------|---------------|
 | **Watch Service** | Polls configured folders for changes, emits file-detected events |
-| **File Service** | Abstraction over CloudDrive2 gRPC for all file operations (list, move, rename, mkdir) |
+| **File Service** | Abstraction over [clouddrive2-client](https://pypi.org/project/clouddrive2-client) for all file operations (list, move, rename, mkdir) |
 | **LLM Client** | Sends file/folder names to the LLM, parses structured recognition results |
 | **TMDB Client** | Searches and fetches metadata from TMDB, handles rate limiting |
 | **Movie Recognizer** | Orchestrates LLM + TMDB for movie identification |
@@ -797,16 +801,14 @@ Each module exposes a well-defined interface (Python ABC or Protocol class). Thi
 
 # Reference Projects
 
-- TV show recognizing: https://github.com/narapeka/aigua.tv
-- Movie recognizing: https://github.com/narapeka/AIGua
+- TV show recognizing: `/reference/aigua.tv`
+- Movie recognizing: `/reference/AIGua`
 - Transfer: `/reference/addlib`
-- Category: https://github.com/narapeka/MoviePilot-Plugins/blob/main/plugins.v2/filenamecategory/__init__.py
+- Category: `/filenamecategory/__init__.py`
 
 **CRITICAL -- Migration, not rewrite:**
 The recognition logic in AIGUA (movie) and AIGUA.tv (TV show) has been battle-tested with many edge cases. When implementing the Movie Recognizer and TV Show Recognizer modules:
 1. **Read the source code** from the reference repos first. Understand the logic flow, edge case handling, and TMDB interaction patterns.
 2. **Port the core logic** into the new module structure. Adapt the code architecture to fit Videx's module interfaces, but preserve the recognition algorithms, confidence scoring, and edge case handling as-is.
 3. **Do NOT rewrite from scratch** based on the requirements description alone. The descriptions in this document are summaries -- the actual implementations handle many more edge cases than what is documented here.
-4. Same applies to the transfer logic in `/reference/addlib` and the category logic in the MoviePilot-Plugins reference.
-
-**[TODO]** Before implementation, clone the AIGUA and AIGUA.tv source files into `/reference/` so the AI agent has direct local access during coding, rather than relying on fetching from GitHub URLs.
+4. Same applies to the transfer logic in `/reference/addlib` and the category logic in the `/filenamecategory/__init__.py` reference.
