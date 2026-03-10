@@ -1,0 +1,777 @@
+@use "sass:color";
+
+// 主色调 - 紫色系
+$primary-purple: #6B46C1;  // 主紫色
+$primary-light: #9F7AEA;  // 浅紫色
+$primary-dark: #553C9A;   // 深紫色
+$primary-lighter: #E9D8FD; // 更浅的紫色
+$primary-darker: #44337A;  // 更深的紫色
+
+// 扩展紫色系
+$purple-50: #F5F3FF;    // 最浅的紫色
+$purple-100: #EDE9FE;   // 浅紫色背景
+$purple-200: #DDD6FE;   // 浅紫色边框
+$purple-300: #C4B5FD;   // 中等浅紫色
+$purple-400: #A78BFA;   // 中等紫色
+$purple-500: #8B5CF6;   // 标准紫色
+$purple-600: #7C3AED;   // 深紫色
+$purple-700: #6D28D9;   // 更深的紫色
+$purple-800: #5B21B6;   // 深紫色背景
+$purple-900: #4C1D95;   // 最深的紫色
+
+// 中性色
+$white: #FFFFFF;
+$gray-50: #F7FAFC;
+$gray-100: #EDF2F7;
+$gray-200: #E2E8F0;
+$gray-300: #CBD5E0;
+$gray-400: #A0AEC0;
+$gray-500: #718096;
+$gray-600: #4A5568;
+$gray-700: #2D3748;
+$gray-800: #1A202C;
+$gray-900: #171923;
+$black: #000000;
+
+// 功能色
+$success: #48BB78;
+$warning: #ECC94B;
+$error: #F56565;
+$info: #4299E1;
+
+// 深色主题背景色
+$dark-bg-primary: #1A1625;     // 深色主背景色
+$dark-bg-secondary: #2D2438;   // 深色次要背景色
+$dark-bg-card: rgba(45, 36, 56, 0.95); // 深色卡片背景色
+$dark-bg-table: #232030;       // 深色表格背景
+$dark-bg-table-hover: #2F2B3A; // 深色表格悬停背景
+$dark-border: #352C45;         // 深色边框颜色
+
+// 深色主题文本颜色
+$dark-text-primary: $white;         // 主要文本颜色
+$dark-text-secondary: $gray-300;    // 次要文本颜色
+$dark-text-muted: $gray-500;        // 弱化文本颜色
+
+// 使用深色主题作为默认背景色
+$bg-primary: $dark-bg-primary;     // 主背景色
+$bg-secondary: $dark-bg-secondary;  // 次要背景色
+$bg-card: $dark-bg-card;            // 卡片背景色
+
+// 阴影 - 深色主题更柔和的阴影
+$shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.15);
+$shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.2), 0 2px 4px -1px rgba(0, 0, 0, 0.16);
+$shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.2), 0 4px 6px -2px rgba(0, 0, 0, 0.15);
+
+// 圆角
+$radius-sm: 0.25rem;
+$radius-md: 0.375rem;
+$radius-lg: 0.5rem;
+$radius-full: 9999px;
+
+// 间距
+$spacing-xs: 0.25rem;
+$spacing-sm: 0.5rem;
+$spacing-md: 1rem;
+$spacing-lg: 1.5rem;
+$spacing-xl: 2rem;
+
+// 过渡
+$transition-base: all 0.2s ease-in-out;
+$transition-fast: all 0.1s ease-in-out;
+$transition-slow: all 0.3s ease-in-out;
+
+// 混合模式
+@mixin hover-effect {
+  transition: $transition-base;
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: $shadow-md;
+  }
+}
+
+@mixin card-style {
+  background: $bg-card;
+  border-radius: $radius-lg;
+  box-shadow: $shadow-md;
+  padding: $spacing-lg;
+  backdrop-filter: blur(10px);
+  border: 1px solid $dark-border;
+  color: $dark-text-primary;
+}
+
+@mixin button-primary {
+  background: $purple-600;
+  color: $white;
+  padding: $spacing-sm $spacing-md;
+  border-radius: $radius-md;
+  border: none;
+  cursor: pointer;
+  transition: $transition-base;
+  
+  &:hover {
+    background: $purple-700;
+    transform: translateY(-1px);
+  }
+}
+
+@mixin input-style {
+  border: 1px solid $dark-border;
+  border-radius: $radius-md;
+  padding: $spacing-sm;
+  transition: $transition-base;
+  background-color: rgba($dark-bg-secondary, 0.8);
+  color: $dark-text-primary;
+  
+  &:focus {
+    outline: none;
+    border-color: $purple-500;
+    box-shadow: 0 0 0 2px rgba($purple-500, 0.2);
+  }
+}
+
+// 全局样式
+body {
+  background-color: $bg-primary;
+  color: $dark-text-primary;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  line-height: 1.5;
+  /* 防止不必要的竖向滚动条 */
+  margin: 0;
+  height: 100vh;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+html {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+// 添加Element Plus表格的CSS变量覆盖
+:root {
+  // 表格边框颜色变量
+  --el-table-border-color: #{$dark-border} !important;
+  --el-table-border: 1px solid #{$dark-border} !important;
+  --el-table-header-border-color: #{$dark-border} !important;
+  --el-table-header-bg-color: #{$dark-bg-secondary} !important;
+  --el-table-row-hover-bg-color: #{$dark-bg-table-hover} !important;
+  --el-table-bg-color: #{$dark-bg-table} !important;
+  --el-table-tr-bg-color: #{$dark-bg-table} !important;
+  --el-table-expanded-cell-bg-color: #{$dark-bg-table} !important;
+  --el-table-fixed-box-shadow: 0 0 10px rgba(0, 0, 0, 0.3) !important;
+
+  // 下拉框相关变量
+  --el-select-dropdown-bg-color: #{$dark-bg-secondary} !important;
+  --el-select-dropdown-border-color: #{$dark-border} !important;
+  --el-select-dropdown-item-hover-color: #{$dark-bg-table-hover} !important;
+  --el-select-input-focus-border-color: #{$purple-400} !important;
+  --el-select-dropdown-item-color: #{$dark-text-primary} !important;
+
+  // 弹出框相关变量
+  --el-popover-bg-color: #{$dark-bg-secondary} !important;
+  --el-popover-border-color: #{$dark-border} !important;
+  --el-popper-border-color: #{$dark-border} !important;
+  
+  // 图标颜色变量
+  --el-icon-color: #{$dark-text-primary} !important;
+  --el-color-primary: #{$purple-500} !important;
+}
+
+// 滚动条样式
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba($dark-bg-secondary, 0.5);
+  border-radius: $radius-full;
+}
+
+::-webkit-scrollbar-thumb {
+  background: $purple-400;
+  border-radius: $radius-full;
+  
+  &:hover {
+    background: $purple-500;
+  }
+}
+
+// 表格滚动条修复 - 强化横向滚动条隐藏
+.el-table__body-wrapper::-webkit-scrollbar,
+.el-table__header-wrapper::-webkit-scrollbar,
+.el-table__footer-wrapper::-webkit-scrollbar,
+.el-table::-webkit-scrollbar,
+.el-scrollbar__bar.is-horizontal {
+  width: 0 !important;
+  height: 0 !important;
+  display: none !important;
+  background: transparent !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+}
+
+// 表格横向滚动条特别处理
+.el-scrollbar__bar.is-horizontal {
+  display: none !important;
+  height: 0 !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+}
+
+// 表格样式
+.el-table {
+  background-color: $dark-bg-table !important;
+  color: $dark-text-primary !important;
+  border: 1px solid $dark-border !important;
+  
+  /* 防止表格滚动条 */
+  &, &:hover, &:focus {
+    overflow-x: hidden !important;
+    overflow-y: hidden !important;
+  }
+  
+  .el-table__body-wrapper,
+  .el-table__header-wrapper,
+  .el-table__footer-wrapper {
+    overflow-x: hidden !important;
+    overflow-y: hidden !important;
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
+    max-width: 100% !important;
+  }
+  
+  /* 强制消除所有内部滚动条 */
+  .el-scrollbar, 
+  .el-scrollbar__bar.is-horizontal,
+  .el-scrollbar__wrap,
+  .el-scrollbar__view {
+    height: auto !important;
+    overflow-x: hidden !important;
+    overflow-y: hidden !important;
+    max-width: 100% !important;
+  }
+  
+  .horizontal-scroll-wrapper,
+  .body--wrapper {
+    overflow-x: hidden !important;
+    overflow-y: hidden !important;
+  }
+  
+  .el-table__inner-wrapper {
+    border: 1px solid $dark-border !important;
+    background-color: $dark-bg-table !important;
+  }
+  
+  .el-table__inner-wrapper::before,
+  .el-table__inner-wrapper::after {
+    background-color: $dark-border !important;
+  }
+  
+  &.el-table--border, 
+  &.el-table--group {
+    border: 1px solid $dark-border !important;
+    border-top: 1px solid $dark-border !important;
+    border-bottom: 1px solid $dark-border !important;
+    border-left: 1px solid $dark-border !important;
+    border-right: 1px solid $dark-border !important;
+    
+    &::after, 
+    &::before {
+      background-color: $dark-border !important;
+    }
+    
+    .el-table__cell {
+      border-right: 1px solid $dark-border !important;
+    }
+    
+    .el-table__footer-wrapper,
+    .el-table__header-wrapper {
+      border-right: 1px solid $dark-border !important;
+    }
+  }
+  
+  // 覆盖虚线和边框补丁
+  &::before,
+  &::after {
+    background-color: $dark-border !important;
+  }
+  
+  .el-table__border-left-patch {
+    background-color: $dark-bg-secondary !important; 
+    border-bottom: 1px solid $dark-border !important;
+  }
+  
+  .el-table__header-wrapper,
+  .el-table__header {
+    background-color: $dark-bg-secondary !important;
+  }
+  
+  // 修复表头边框
+  .el-table__header-wrapper {
+    border-bottom: 1px solid $dark-border !important;
+  }
+  
+  // 修复表尾边框
+  .el-table__footer-wrapper {
+    border-top: 1px solid $dark-border !important;
+    background-color: $dark-bg-secondary !important;
+  }
+  
+  // 修复固定列边框
+  .el-table__fixed::before,
+  .el-table__fixed-right::before {
+    background-color: $dark-border !important;
+  }
+  
+  .el-table__fixed {
+    border-right: 1px solid $dark-border !important;
+  }
+  
+  .el-table__fixed-right {
+    border-left: 1px solid $dark-border !important;
+  }
+  
+  th.el-table__cell {
+    background-color: $dark-bg-secondary !important;
+    color: $dark-text-primary !important;
+    border-bottom: 1px solid $dark-border !important;
+  }
+  
+  .el-table__body-wrapper {
+    background-color: $dark-bg-table !important;
+  }
+  
+  td.el-table__cell {
+    border-bottom: 1px solid $dark-border !important;
+    background-color: $dark-bg-table !important;
+    color: $dark-text-primary !important;
+  }
+  
+  tr.el-table__row {
+    background-color: $dark-bg-table !important;
+  }
+  
+  tr:hover > td.el-table__cell {
+    background-color: $dark-bg-table-hover !important;
+  }
+  
+  .el-table__empty-block {
+    background-color: $dark-bg-table !important;
+  }
+  
+  .el-table__empty-text {
+    color: $dark-text-secondary !important;
+  }
+  
+  .cell {
+    color: $dark-text-primary !important;
+  }
+  
+  // 修复表格中的表单元素样式
+  .el-input__wrapper {
+    background-color: rgba($dark-bg-secondary, 0.8) !important;
+    border: 1px solid $dark-border !important;
+    box-shadow: none !important;
+    
+    .el-input__inner {
+      color: $dark-text-primary !important;
+    }
+    
+    &:hover {
+      border-color: $purple-400 !important;
+    }
+  }
+  
+  .el-select .el-input {
+    color: $dark-text-primary !important;
+  }
+}
+
+// 表单元素样式
+.el-input__inner, 
+.el-textarea__inner {
+  background-color: rgba($dark-bg-secondary, 0.8) !important;
+  border: 1px solid $dark-border !important;
+  color: $dark-text-primary !important;
+  
+  &:focus {
+    border-color: $purple-500 !important;
+  }
+}
+
+// 按钮样式
+.el-button {
+  border: 1px solid $dark-border !important;
+  
+  &--primary {
+    background-color: $purple-600 !important;
+    border-color: $purple-700 !important;
+    
+    &:hover, &:focus {
+      background-color: $purple-700 !important;
+    }
+  }
+  
+  &--warning {
+    background-color: #C27232 !important;
+    border-color: #A05A28 !important;
+    color: $white !important;
+    
+    &:hover, &:focus {
+      background-color: #A05A28 !important;
+      border-color: #834A20 !important;
+    }
+  }
+  
+  &--default {
+    background-color: $dark-bg-secondary !important;
+    color: $dark-text-primary !important;
+    
+    &:hover, &:focus {
+      background-color: color.adjust($dark-bg-secondary, $lightness: 5%) !important;
+    }
+  }
+}
+
+// 卡片样式
+.el-card {
+  background-color: $dark-bg-card !important;
+  border: 1px solid $dark-border !important;
+  color: $dark-text-primary !important;
+  
+  .el-card__header {
+    border-bottom: 1px solid $dark-border !important;
+  }
+}
+
+// 弹窗样式
+.el-dialog {
+  background-color: $dark-bg-card !important;
+  border: 1px solid $dark-border !important;
+  
+  .el-dialog__title {
+    color: $dark-text-primary !important;
+  }
+  
+  .el-dialog__headerbtn .el-dialog__close {
+    color: $dark-text-secondary !important;
+  }
+}
+
+// 下拉菜单样式
+.el-dropdown-menu {
+  background-color: $dark-bg-secondary !important;
+  border: 1px solid $dark-border !important;
+  
+  .el-dropdown-menu__item {
+    color: $dark-text-primary !important;
+    
+    &:hover {
+      background-color: $dark-bg-table-hover !important;
+    }
+  }
+}
+
+// 标签页样式
+.el-tabs {
+  .el-tabs__header {
+    border-bottom: 1px solid $dark-border !important;
+  }
+  
+  .el-tabs__item {
+    color: $dark-text-secondary !important;
+    
+    &.is-active {
+      color: $purple-400 !important;
+    }
+    
+    &:hover {
+      color: $purple-300 !important;
+    }
+  }
+}
+
+// 分页组件样式
+.el-pagination {
+  color: $dark-text-secondary !important;
+  
+  .btn-prev, .btn-next {
+    background-color: $dark-bg-secondary !important;
+    color: $dark-text-secondary !important;
+  }
+  
+  .el-pager li {
+    background-color: $dark-bg-secondary !important;
+    color: $dark-text-secondary !important;
+    
+    &.active {
+      color: $purple-400 !important;
+    }
+    
+    &:hover {
+      color: $purple-300 !important;
+    }
+  }
+}
+
+// 警告、成功、错误提示
+.el-message {
+  background-color: $dark-bg-secondary !important;
+  border-color: $dark-border !important;
+  
+  &--success {
+    background-color: rgba($success, 0.2) !important;
+    border-color: $success !important;
+  }
+  
+  &--warning {
+    background-color: rgba($warning, 0.2) !important;
+    border-color: $warning !important;
+  }
+  
+  &--error {
+    background-color: rgba($error, 0.2) !important;
+    border-color: $error !important;
+  }
+  
+  &--info {
+    background-color: rgba($info, 0.2) !important;
+    border-color: $info !important;
+  }
+}
+
+// 树形控件样式
+.el-tree {
+  background-color: transparent !important;
+  color: $dark-text-primary !important;
+  
+  .el-tree-node__content:hover {
+    background-color: $dark-bg-table-hover !important;
+  }
+  
+  .is-current .el-tree-node__content {
+    background-color: rgba($purple-600, 0.2) !important;
+  }
+}
+
+// 下拉框样式增强
+.el-select-dropdown {
+  background-color: $dark-bg-secondary !important;
+  border: 1px solid $dark-border !important;
+  
+  .el-select-dropdown__item {
+    color: $dark-text-primary !important;
+    background-color: $dark-bg-secondary !important;
+    
+    &.selected,
+    &.is-selected,
+    &.hover {
+      background-color: color.adjust($dark-bg-secondary, $lightness: 5%) !important;
+      color: $purple-400 !important;
+    }
+    
+    &:hover {
+      background-color: $dark-bg-table-hover !important;
+    }
+    
+    &:not(.selected):not(.is-selected) {
+      background-color: $dark-bg-secondary !important;
+    }
+  }
+  
+  .el-select-dropdown__list {
+    background-color: $dark-bg-secondary !important;
+  }
+  
+  .el-popper__arrow::before {
+    background-color: $dark-bg-secondary !important;
+    border-color: $dark-border !important;
+  }
+}
+
+// 下拉框外层包装器
+.el-popper.is-light {
+  background-color: $dark-bg-secondary !important;
+  border: 1px solid $dark-border !important;
+  
+  .el-popper__arrow::before {
+    background-color: $dark-bg-secondary !important;
+    border-color: $dark-border !important;
+  }
+}
+
+// 强制修改所有图标颜色为白色
+.el-icon {
+  color: $dark-text-primary !important;
+  
+  svg {
+    fill: currentColor !important;
+  }
+}
+
+// 扩展特定图标组件的样式
+.el-button .el-icon {
+  &.el-icon--left, &.el-icon--right {
+    color: inherit !important;
+  }
+}
+
+.el-button--primary .el-icon {
+  color: $white !important;
+}
+
+.el-input__icon, 
+.el-select__icon, 
+.el-tree-node__expand-icon {
+  color: $dark-text-secondary !important;
+}
+
+// 弹出框样式
+.el-popper {
+  border: 1px solid $dark-border !important;
+  background-color: $dark-bg-secondary !important;
+  
+  .el-popper__arrow::before {
+    border-color: $dark-border !important;
+    background-color: $dark-bg-secondary !important;
+  }
+}
+
+// 强制select元素背景色
+.el-select-dropdown__wrap {
+  background-color: $dark-bg-secondary !important;
+  max-height: 274px;
+}
+
+.el-scrollbar__view {
+  background-color: $dark-bg-secondary !important;
+}
+
+.el-select .el-input__wrapper {
+  background-color: $dark-bg-secondary !important;
+  
+  .el-input__inner {
+    background-color: $dark-bg-secondary !important;
+    color: $dark-text-primary !important;
+  }
+}
+
+.el-input__suffix {
+  background-color: transparent !important;
+}
+
+// 更强的图标颜色控制
+.el-select__caret, 
+.el-input__icon {
+  color: $dark-text-primary !important;
+  background-color: transparent !important;
+}
+
+// 弹框内部图标
+.el-dialog, 
+.el-card, 
+.el-table {
+  .el-icon {
+    color: $dark-text-primary !important;
+    
+    svg {
+      fill: currentColor !important;
+    }
+  }
+}
+
+.el-table {
+  .el-select {
+    .el-input__wrapper {
+      background-color: $dark-bg-secondary !important;
+    }
+    
+    .el-input__inner {
+      color: $dark-text-primary !important;
+      background-color: $dark-bg-secondary !important;
+    }
+  }
+}
+
+// 全局修复按钮图标悬停样式
+.el-button.el-button--default {
+  &:hover, &:active, &:focus {
+    .el-icon {
+      color: $purple-400 !important;
+      
+      svg {
+        fill: $purple-400 !important;
+        color: $purple-400 !important;
+      }
+    }
+  }
+}
+
+// 特定修复路径选择器按钮
+.path-selector {
+  .el-button, 
+  .el-button:hover, 
+  .el-button:focus, 
+  .el-button:active {
+    .el-icon {
+      color: $purple-400 !important;
+      
+      svg {
+        fill: $purple-400 !important;
+        color: $purple-400 !important;
+      }
+    }
+  }
+}
+
+// 表格内按钮强制样式
+.el-table {
+  .el-button--default {
+    &:hover, &:active, &:focus {
+      .el-icon {
+        color: $purple-400 !important;
+        
+        svg {
+          fill: $purple-400 !important;
+          color: $purple-400 !important;
+        }
+      }
+    }
+  }
+}
+
+/* 全局修复输入框样式 */
+.el-input {
+  .el-input__wrapper {
+    /* 使用盒阴影代替边框，避免双层边框问题 */
+    box-shadow: 0 0 0 1px $dark-border inset !important;
+    background-color: rgba($dark-bg-secondary, 0.8) !important;
+    
+    &:hover {
+      box-shadow: 0 0 0 1px $purple-400 inset !important;
+    }
+    
+    &.is-focus {
+      box-shadow: 0 0 0 1px $purple-500 inset !important;
+      
+      /* 禁用内部文本框的outline */
+      .el-input__inner {
+        outline: none !important;
+      }
+    }
+  }
+  
+  .el-input__inner {
+    background-color: transparent !important;
+    color: $dark-text-primary !important;
+    /* 覆盖浏览器默认的focus样式 */
+    &:focus {
+      outline: none !important;
+      box-shadow: none !important;
+    }
+  }
+} 

@@ -1,0 +1,31 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.log
+
+# PyBuilder
+.pybuilder/
+target/
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# PyPI configuration file
+.pypirc
+
+# nodejs
+node_modules/
+logs/
+dist/
+.env.local
+.env.*.local
+*.tar
+
+.DS_Store
+
+config.yaml

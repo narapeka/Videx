@@ -1,0 +1,11 @@
+<svg width="120" height="120" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- 圆形背景 -->
+  <circle cx="60" cy="60" r="60" fill="#2D1F3D"/>
+  
+  <!-- 抽象A形状 -->
+  <path d="M40 85L60 35L80 85" stroke="#A78BFA" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M45 70H75" stroke="#A78BFA" stroke-width="10" stroke-linecap="round"/>
+  
+  <!-- 抽象水滴形状 - 代表Gua -->
+  <path d="M60 40C60 40 75 55 75 70C75 77.5 68.5 83 60 83C51.5 83 45 77.5 45 70C45 55 60 40 60 40Z" fill="#7C3AED" fill-opacity="0.5"/>
+</svg> 
