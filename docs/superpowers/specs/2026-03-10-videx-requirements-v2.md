@@ -389,7 +389,13 @@ Evaluates category rules in order against a recognized media item. Returns the f
 matching category name and its config.
 
 **Input:** `title`, `year`, `media_type`, `tmdb_detail` (genres, origin_country,
-original_language), `filename` (for keyword matching), `file_extension`.
+original_language), `source_filename` (the **original** filename from the watch folder,
+before any renaming), `file_extension`.
+
+> **Why `source_filename`?** Naming rules strip technical tags like `REMUX`, `WEB-DL`,
+> `2160p` from the output filename. `filename_keywords` matching must run against the
+> original filename — otherwise a file renamed to `Test Movie2.mkv` would never match
+> the `remux` keyword rule.
 
 **Output:** `CategoryMatch(name: str, library_path: str, organize_by_initial: bool)`
 
@@ -474,8 +480,10 @@ all season/episode detection patterns. Do not rewrite; port and adapt to module 
 Triggered automatically (high-confidence items) or after user resolution (unmatched items).
 
 **Process per item:**
-1. Apply `NamingService` to produce target folder + file names
-2. Determine category via `CategoryService`
+1. Determine category via `CategoryService` using `media_items.source_path` (original
+   filename) — **before any renaming**. Store result in `media_items.category`.
+2. Apply `NamingService` to produce target folder + file names (uses TMDB metadata,
+   not the source filename).
 3. Log all planned moves to `file_operations` (status=`planned`)
 4. Move files via `FileService` into the `organized_folder`:
    ```
@@ -504,6 +512,11 @@ Triggered automatically (high-confidence items) or after user resolution (unmatc
 ### 5.2 Transfer Step
 
 Moves organized files from `organized_folder` to their category's `library_path`.
+
+The category was already determined and stored in `media_items.category` during the
+organize step. Transfer reads `media_items.category` directly — it does **not**
+re-evaluate category rules. This is important because the organized filename no longer
+contains the original technical keywords (e.g. `REMUX`) that the category rules match on.
 
 **Overwrite modes:**
 
